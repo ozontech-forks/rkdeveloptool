@@ -2,10 +2,15 @@ cmake_minimum_required(VERSION 3.19)
 
 project(rkdeveloptool VERSION 1.32 LANGUAGES CXX)
 
+set(UDEV_RULES_DIR "lib/udev/rules.d"
+    CACHE PATH "Directory to install udev rules.")
+
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
+include(GNUInstallDirs)
 
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(LIBUSB1 REQUIRED libusb-1.0)
@@ -39,3 +44,9 @@ target_include_directories(rkdeveloptool PRIVATE
 )
 
 target_link_libraries(rkdeveloptool PRIVATE ${LIBUSB1_LIBRARIES})
+
+install(TARGETS rkdeveloptool RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}")
+
+if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    install(FILES 99-rk-rockusb.rules DESTINATION "${UDEV_RULES_DIR}")
+endif()
